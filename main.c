@@ -1,44 +1,69 @@
 /* Nguyen Trong Quy 20233608 HTNhung 169260
    Tesst git
 */
-
+/* Nguyen Trong Quy 20233608 HTNhung 169260
+   Date: 3/2026
+   Asm3 Ex3: Exercise 3. Write a program to print a set of files, starting each new one on a new page, with a title
+and a running page count for each file. (7.8)
+*/
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-int htoi(char s[]) {
-    int i = 0;
-    int result = 0;
+#define MAX_LINE_LEN 1000
+#define LINES_PER_PAGE 10
 
-    // Bỏ qua tiền tố 0x hoặc 0X
-    if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
-        i = 2;
+typedef enum { false, true } boolean;
 
-    while (s[i] != '\0') {
-        int digit;
+boolean parse_arg_list(int argc, char *argv[]);
+void print_file(char *file_name);
 
-        if (s[i] >= '0' && s[i] <= '9')
-            digit = s[i] - '0';          // '0'-'9' → 0-9
-        else if (s[i] >= 'a' && s[i] <= 'f')
-            digit = s[i] - 'a' + 10;     // 'a'-'f' → 10-15
-        else if (s[i] >= 'A' && s[i] <= 'F')
-            digit = s[i] - 'A' + 10;     // 'A'-'F' → 10-15
-        else
-            break; // Ký tự không hợp lệ → dừng
+char *program_name;
 
-        result = result * 16 + digit;
-        i++;
+int main(int argc, char *argv[]) {
+    if (!parse_arg_list(argc, argv)) {
+        exit(EXIT_FAILURE);
     }
 
-    return result;
+    while (--argc > 0) {
+        print_file(*++argv);
+        if (argc != 1) { putc('\n', stdout);
+        }
+    }
+
+    exit(EXIT_SUCCESS);
 }
 
-int main() {
-    printf("\"ff\"     = %d\n", htoi("ff"));       // 255
-    printf("\"FF\"     = %d\n", htoi("FF"));       // 255
-    printf("\"0xff\"   = %d\n", htoi("0xff"));     // 255
-    printf("\"0XFF\"   = %d\n", htoi("0XFF"));     // 255
-    printf("\"1a3\"    = %d\n", htoi("1a3"));      // 419
-    printf("\"0x400\"  = %d\n", htoi("0x400"));    // 1024
+boolean parse_arg_list(int argc, char *argv[]) {
+    const char *program_name = argv[0];
 
-    return 0;
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s [FILE]...\n", program_name);
+        return false;
+    }
+
+    return true;
 }
 
+void print_file(char *file_name) {
+    FILE *file_p;
+    if ((file_p = fopen(file_name, "r")) == NULL) {
+        fprintf(stderr, "%s: can't open %s.\n", program_name, file_name);
+        exit(EXIT_FAILURE);
+    }
+
+    size_t line_number = 1;
+    char line[MAX_LINE_LEN];
+    while (fgets(line, MAX_LINE_LEN, file_p) != NULL) {
+        if ((line_number - 1) % LINES_PER_PAGE == 0) {
+            printf("[%s]: page %zu\n", file_name,
+                   line_number / LINES_PER_PAGE + 1);
+        }
+
+        printf("%zu: %s", line_number, line);
+        ++line_number;
+    }
+}
+
+// NOTE: run: ./print ../exercise_7_7/file_1.txt ../exercise_7_7/file_2.txt
+// ./print.c
