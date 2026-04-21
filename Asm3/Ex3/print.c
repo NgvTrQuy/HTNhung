@@ -10,7 +10,11 @@ and a running page count for each file. (7.8)
 #define MAX_LINE_LEN 1000
 #define LINES_PER_PAGE 10
 
-typedef enum { false, true } boolean;
+//typedef enum { false, true } boolean;
+typedef enum {
+    BOOL_FALSE,
+    BOOL_TRUE
+} boolean;
 
 boolean parse_arg_list(int argc, char *argv[]);
 void print_file(char *file_name);
@@ -62,5 +66,6 @@ void print_file(char *file_name) {
     }
 }
 
-// NOTE: run: ./print ../exercise_7_7/file_1.txt ../exercise_7_7/file_2.txt
+// NOTE: run: ./print ../Ex2/file_1.txt ../Ex2/file_2.txt
+//  win: .\print.exe ..\Ex2\file_1.txt ..\Ex2\file_2.txt
 // ./print.c
